@@ -11,8 +11,10 @@ import java.util.LinkedList;
 public class CountingGame {
 	
 	private LinkedList<Integer> members = null;
+	private int membersCount = 0;
 	
-	public CountingGame(int membersCount) throws IOException {
+	public CountingGame(int mc) throws IOException {
+		this.membersCount = mc;
 		System.out.println("Vorbereitung...[" + init(membersCount)+ "]");
 		System.out.println("Starten? Y/N");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -26,15 +28,11 @@ public class CountingGame {
 		}
 	    
 	    if(input.equals("Y")) {
-	    	int startPoint = -1;
-	    		do{
-	    			System.out.println("Startpunkt eingeben (1-" + members.size() + ":");
-	    			input = in.readLine();
-	    			System.out.println("Anzahl Teilnehmer: " + input);
-	    			startPoint = Integer.getInteger(input);
-	    		}while(startPoint < 1 || startPoint > members.size());
-	    		
-	    	run(startPoint);
+	    	LinkedList<Integer> list = run(members);
+	    	if(list.size() > 2) {
+	    		System.out.println("Erste Schleife zu ende. Weiter? Y/N");
+	    		input = in.readLine();
+	    	}
 	    	
 	    	System.out.print("Ergebniss anzeigen? Y/N");
 	    	input = in.readLine();
@@ -50,34 +48,38 @@ public class CountingGame {
 	private final String init(int membersCount) {
 		
 		members = new LinkedList<Integer>();
-		for(int i=0; i<= membersCount; i++) {
-			members.add(i, i);
+		for(int i=1; i<= membersCount; i++) {
+			System.out.println("Füge Teilnehmer " + i + " hinzu.");
+			members.add(i-1, i);
 		}		
 		return "OK";
 	}
 	
-	public final void run(int from) {
+	public final LinkedList<Integer> run(LinkedList<Integer> members) {
 		Iterator<Integer> iterator = members.iterator();
-		int nextInRow = from+3;
+		int nextInRow = 3;
 		
-		while (iterator.hasNext()) {
-			if(nextInRow > members.size()) {
-				System.out.println("Ende erreicht!");
+		LinkedList<Integer> toRemove = new LinkedList<Integer>();
+		
+		while(iterator.hasNext()) {
+			toRemove.add(nextInRow);
+			nextInRow = nextInRow + 3;
+			if(nextInRow > membersCount) {
+				System.out.println("Schleife zu Ende.");
+				for(int i=0; i<toRemove.size(); i++)
+					members.remove(i);
 				break;
-			}else {
-				System.out.println("Entferne " + nextInRow);
-				members.remove(nextInRow);
-				nextInRow = nextInRow+3;
 			}
-        }
-		
+		}		
+		return members;		
 	}
 	
 	public final String getLastMembers() {
 		
 		Iterator it = members.iterator();
-		String lastMembers = null;
+		String lastMembers = "";
 		
+		System.out.println("Rest: " + members.size());
 		
 		for(int i=0; it.hasNext(); i++)	
 			lastMembers = lastMembers + members.get(i) + " - ";
