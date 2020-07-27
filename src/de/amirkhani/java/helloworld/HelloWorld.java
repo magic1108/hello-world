@@ -5,7 +5,8 @@ import java.io.IOException;
 public class HelloWorld {
 	
 	public static void main(String[] args) throws IOException {
-		CountingGame cg = new CountingGame(1000);
+		CountingGame2 cg = new CountingGame2();
+		cg.run();
 	}	
 
 }
